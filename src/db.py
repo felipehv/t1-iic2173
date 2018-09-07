@@ -1,4 +1,5 @@
 import psycopg2 as psql
+import datetime
 from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
@@ -22,14 +23,35 @@ class DB():
                 pass
 
     def init_db(self):
-        self.cur.execute("CREATE TABLE messages(id serial,  text)")
+        self.cur.execute("DROP TABLE IF EXISTS messages;")
+        self.conn.commit()
+        self.cur.execute("CREATE TABLE messages(id serial, message text, time text, ip text)")
         self.conn.commit()
 
         return        
 
-    def some_query(self, data):
-        
-        
+    def new_message(self, req):
+        time = str(datetime.datetime.now()).split('.')[0]
+        msg = req.get_json(force=True)['message']
+        ip = req.remote_addr
+
+        self.cur.execute('INSERT INTO messages(message, time, ip) values(%s, %s, %s)', (msg, time, ip))
+        self.conn.commit()
+
         data = {}
 
         return data
+
+    def get_queries(self, page):
+        offset = 10 * (page - 1)
+        self.cur.execute('SELECT id, message, time, ip FROM messages ORDER BY id DESC LIMIT 10 OFFSET %s;', (offset, ))
+
+        # Devolver los ultimos 100 mensajes
+        msgs =  list(map(lambda x: {'id': x[0], 'message': x[1], 'time': x[2], 'ip': x[3]}  ,self.cur))
+
+        return msgs
+
+
+if __name__ == "__main__":
+    db = DB()
+    db.init_db()
