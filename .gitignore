@@ -1,2 +1,4 @@
 pyenv/lib
 *.env
+pyenv/*
+pyenv
