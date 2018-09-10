@@ -34,7 +34,7 @@ def ruta():
             status = 400
             result = {'message': 'No message found, send a json with "message" key', 'error': str(e)}
     
-    if request.headers['content-type'] and req.headers['content-type'] == 'application/json':
+    if request.headers['content-type'] and request.headers['content-type'] == 'application/json':
         resp = Response(json.dumps(result), status=status, mimetype='application/json')
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return resp
