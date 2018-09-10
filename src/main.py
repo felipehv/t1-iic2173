@@ -10,6 +10,10 @@ from .db import DB
 app = Flask(__name__)
 CORS(app)
 
+# FIX GET ip address
+from werkzeug.contrib.fixers import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, num_proxies=1)
+
 @app.route("/", methods = ["GET", "POST", "PUT"])
 def ruta():
     # Para evitar problemas con Chrome
