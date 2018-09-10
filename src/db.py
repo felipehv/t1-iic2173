@@ -32,7 +32,10 @@ class DB():
 
     def new_message(self, req):
         time = str(datetime.datetime.now()).split('.')[0]
-        msg = req.get_json(force=True)['message']
+        if req.headers['content-type'] and req.headers['content-type'] == 'application/json':
+            msg = req.get_json(force=True)['message']
+        else:
+            msg = req.form['message']
         ip = req.remote_addr
 
         self.cur.execute('INSERT INTO messages(message, time, ip) values(%s, %s, %s)', (msg, time, ip))
